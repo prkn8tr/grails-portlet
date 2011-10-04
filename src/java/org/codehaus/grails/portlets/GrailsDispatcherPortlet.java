@@ -1,44 +1,52 @@
 package org.codehaus.grails.portlets;
 
-import javax.portlet.ActionRequest;
-import javax.portlet.ActionResponse;
-import javax.portlet.PortletRequest;
-import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
-
-import org.codehaus.groovy.grails.commons.GrailsApplication;
 import org.springframework.web.portlet.DispatcherPortlet;
+
+import javax.portlet.*;
 
 /**
  * @author Lee Butts
  */
 public class GrailsDispatcherPortlet extends DispatcherPortlet {
-    public static final String PORTLET_NAME = "grails.portlet.name";
-    public static final String PORTLET_CONFIG = "grails.portlet.config";
+   public static final String PORTLET_NAME = "grails.portlet.name";
+   public static final String PORTLET_CONFIG = "grails.portlet.config";
+   public static final String PORTLET_CLASS_PARAM = "grailsPortletClass";
 
-    private GrailsApplication application;
+   @Override
+   protected void doActionService(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
+      addPortletInfoToRequest(actionRequest);
+      super.doActionService(actionRequest, actionResponse);
+   }
 
-    protected void doActionService(ActionRequest actionRequest, ActionResponse actionResponse) throws Exception {
-        addPortletInfoToRequest(actionRequest);
-        super.doActionService(actionRequest, actionResponse);
+   @Override
+   protected void doEventService(EventRequest eventRequest, EventResponse eventResponse) throws Exception {
+	   addPortletInfoToRequest(eventRequest);
+	   super.doEventService(eventRequest, eventResponse);
+    }
+   
+   @Override
+   protected void doRenderService(RenderRequest renderRequest, RenderResponse renderResponse) throws Exception {
+      addPortletInfoToRequest(renderRequest);
+      super.doRenderService(renderRequest, renderResponse);
+   }
+   
+   @Override
+   protected void doResourceService(ResourceRequest resourceRequest, ResourceResponse resourceResponse) throws Exception {
+	   addPortletInfoToRequest(resourceRequest);
+	   super.doResourceService(resourceRequest, resourceResponse);
     }
 
-    protected void doRenderService(RenderRequest renderRequest, RenderResponse renderResponse) throws Exception {
-        addPortletInfoToRequest(renderRequest);
-        super.doRenderService(renderRequest, renderResponse);
-    }
+   private void addPortletInfoToRequest(PortletRequest portletRequest) {
+      addPortletNameToRequest(portletRequest);
+      addPortletConfigToRequest(portletRequest);
+   }
 
-    private void addPortletInfoToRequest(PortletRequest portletRequest) {
-        addPortletNameToRequest(portletRequest);
-        addPortletConfigToRequest(portletRequest);
-    }
+   private void addPortletConfigToRequest(PortletRequest portletRequest) {
+      portletRequest.setAttribute(PORTLET_CONFIG, getPortletConfig());
+   }
 
-    private void addPortletConfigToRequest(PortletRequest portletRequest) {
-        portletRequest.setAttribute(PORTLET_CONFIG, getPortletConfig());
-    }
-
-    private void addPortletNameToRequest(PortletRequest request) {
-        String portletName = getPortletConfig().getPortletName();
-        request.setAttribute(PORTLET_NAME, portletName);
-    }
+   private void addPortletNameToRequest(PortletRequest request) {
+      String portletName = getPortletConfig().getPortletName();
+      request.setAttribute(PORTLET_NAME, portletName);
+   }
 }
